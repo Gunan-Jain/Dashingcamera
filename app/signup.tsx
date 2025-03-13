@@ -8,6 +8,7 @@ import {
   Image,
   StyleSheet,
   Switch,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -79,6 +80,41 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [agree, setAgree] = useState(false);
 
+  const handleSignup = async () => {
+    if (!username || !password || !email) {
+      Alert.alert("Error", "All fields are required!");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        "https://api.hetuv2x.com/vehicle-openapi/sys/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username,
+            password,
+            email,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert("Success", "User registered successfully!");
+      } else {
+        Alert.alert("Error", data.message || "Something went wrong.");
+      }
+    } catch (error) {
+      Alert.alert("Error", "Network error. Please try again.");
+      console.error("Signup Error:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Image
@@ -122,7 +158,7 @@ const Signup = () => {
         />
       </View>
 
-      <TouchableOpacity style={styles.signUpButton}>
+      <TouchableOpacity style={styles.signUpButton} onPress={handleSignup}>
         <Text style={styles.signUpText}>Sign Up</Text>
       </TouchableOpacity>
 
